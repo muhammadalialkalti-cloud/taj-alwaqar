@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#14100D">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="تاج الوقار - النظام الهندسي المتكامل لإدارة مسارات حفظ القرآن الكريم، المراجعة التراكمية، ضبط المتشابهات، ومتابعة الإجازة وفق مصحف المدينة النبوية.">
+    
+    <title>تَاج الوَقَار | نظام إتقان القرآن الكريم</title>
+
+    <!-- استدعاء الخطوط العربية التراثية والحديثة عالية الدقة -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Readex+Pro:wght@300;400;500;600;700&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- ربط ملف التصميم الفاخر -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="taj-theme" data-num-system="arab">
+
+    <!-- =========================================================================
+         1. شاشة البداية الملكية (Royal Manuscript Splash Screen)
+         ========================================================================= -->
+    <section id="splash-screen" class="splash-screen">
+        <div class="manuscript-border">
+            <div class="corner-ornament top-right"></div>
+            <div class="corner-ornament top-left"></div>
+            <div class="corner-ornament bottom-right"></div>
+            <div class="corner-ornament bottom-left"></div>
+
+            <div class="splash-inner">
+                <div class="splash-badge">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+                
+                <!-- شعار التاج المحفور بالذهب -->
+                <div class="crown-emblem">
+                    <svg class="crown-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8 48H56L50 22L39 32L32 14L25 32L14 22L8 48Z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
+                        <path d="M6 53H58" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                        <circle cx="32" cy="9" r="3" fill="currentColor"/>
+                        <circle cx="13" cy="17" r="2.5" fill="currentColor"/>
+                        <circle cx="51" cy="17" r="2.5" fill="currentColor"/>
+                        <circle cx="32" cy="39" r="2" fill="currentColor"/>
+                        <circle cx="22" cy="41" r="1.5" fill="currentColor"/>
+                        <circle cx="42" cy="41" r="1.5" fill="currentColor"/>
+                    </svg>
+                </div>
+
+                <h1 class="splash-title">تَاجُ الوَقَار</h1>
+                <p class="splash-subtitle">مِحْرَابُ التَّخْطِيطِ القُرْآنِيِّ وَالإِتْقَانِ وَالإِجَازَة</p>
+
+                <div class="ornamental-divider">
+                    <span class="line"></span>
+                    <span class="diamond">❖</span>
+                    <span class="line"></span>
+                </div>
+
+                <blockquote class="splash-hadith">
+                    «يُوضَعُ عَلَى رَأْسِهِ تَاجُ الْوَقَارِ، الْيَاقُوتَةُ مِنْهَا خَيْرٌ مِنَ الدُّنْيَا وَمَا فِيهَا»
+                </blockquote>
+
+                <!-- ملخص سريع لحالة المستخدم يظهر في شاشة البداية -->
+                <div class="splash-quick-stats" id="splash-stats-bar">
+                    <div class="splash-stat-item">
+                        <span class="s-label">المعيار المعتمد</span>
+                        <span class="s-val">مصحف المدينة (٦٠٤ ص)</span>
+                    </div>
+                    <div class="splash-stat-divider"></div>
+                    <div class="splash-stat-item">
+                        <span class="s-label">نسبة الحفظ الكلية</span>
+                        <span class="s-val" id="splash-total-progress">٠٪</span>
+                    </div>
+                </div>
+
+                <button id="btn-enter-app" class="btn-enter-mihrab" onclick="app.enterMihrab()">
+                    <span>دخول المحراب</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M19 12H5M12 19l-7-7 7-7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- =========================================================================
+         2. الهيكل الرئيسي للتطبيق (Main Application Shell)
+         ========================================================================= -->
+    <div id="app-container" class="app-container hidden">
+
+        <!-- الشريط العلوي الثابت (Header & Global Controls) -->
+        <header class="top-header">
+            <div class="header-brand" onclick="app.showSplash()">
+                <div class="mini-crown">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M3 18h18l-2-10-4 4-3-6-3 6-4-4-2 10z" stroke-width="1.8"/>
+                    </svg>
+                </div>
+                <div class="header-titles">
+                    <h2 id="active-view-title">المحراب اليومي</h2>
+                    <span id="header-date-display" class="header-subdate">...</span>
+                </div>
+            </div>
+
+            <div class="header-actions">
+                <!-- زر تبديل نظام الأرقام (١٢٣ / 123) -->
+                <button class="action-pill" onclick="app.toggleNumeralSystem()" title="تبديل رسم الأرقام بين المشرقية واللاتينية">
+                    <span id="num-system-badge">١٢٣</span>
+                </button>
+
+                <!-- زر معالجة الانقطاع أو تعديل اليوم الطارئ -->
+                <button class="action-icon-btn warning-tint" onclick="app.openRebalanceModal()" title="معالجة انقطاع أو تعديل مسار اليوم">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+
+                <!-- زر دليل الاستخدام الشامل -->
+                <button class="action-icon-btn" onclick="app.openGuideModal()" title="دليل استخدام تاج الوقار">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" stroke-width="2" stroke-linecap="round"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+
+                <!-- زر خزينة البيانات والنسخ الاحتياطي -->
+                <button class="action-icon-btn" onclick="app.openVaultModal()" title="النسخ الاحتياطي وإدارة البيانات">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <polyline points="7 10 12 15 17 10" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <line x1="12" y1="15" x2="12" y2="3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- منطقة المحتوى المتغير حسب التبويب النشط -->
+        <main class="main-viewport">
+
+            <!-- =================================================================
+                 التبويب 1: المحراب اليومي (Daily Mihrab & Werd Execution)
+                 ================================================================= -->
+            <section id="tab-dashboard" class="tab-pane active">
+                
+                <!-- بطاقة القيادة اليومية -->
+                <div class="hero-command-card">
+                    <div class="hero-top-row">
+                        <div class="plan-selector-wrap">
+                            <span class="tiny-label">المسار النشط:</span>
+                            <select id="dashboard-plan-select" class="royal-select" onchange="app.switchActivePlan(this.value)">
+                                <!-- يتم ملؤه برمجياً بالخطط -->
+                            </select>
+                        </div>
+                        <span id="today-day-type-badge" class="status-badge badge-work">يوم إنجاز</span>
+                    </div>
+
+                    <div class="hero-main-grid">
+                        <!-- حلقة الإنجاز اليومي -->
+                        <div class="progress-ring-box">
+                            <svg class="progress-ring" width="96" height="96" viewBox="0 0 100 100">
+                                <circle class="ring-bg" cx="50" cy="50" r="42" />
+                                <circle id="daily-ring-fill" class="ring-fill" cx="50" cy="50" r="42" stroke-dasharray="263.89" stroke-dashoffset="263.89" />
+                            </svg>
+                            <div class="ring-center-text">
+                                <strong id="daily-percent-text">٠٪</strong>
+                                <span>وِرد اليوم</span>
+                            </div>
+                        </div>
+
+                        <!-- تفاصيل موقع الطالب في الخطة -->
+                        <div class="hero-info-col">
+                            <div class="day-navigator">
+                                <button class="nav-arrow-btn" onclick="app.navigatePlanDay(-1)" title="اليوم السابق في الخطة">❮</button>
+                                <div class="day-title-box">
+                                    <h3 id="current-plan-day-title">اليوم الأول</h3>
+                                    <span id="current-plan-day-subtitle">الجزء الأول • الحزب الأول</span>
+                                </div>
+                                <button class="nav-arrow-btn" onclick="app.navigatePlanDay(1)" title="اليوم التالي في الخطة">❯</button>
+                            </div>
+
+                            <div class="quick-metrics-strip">
+                                <div class="q-metric">
+                                    <span class="qm-val" id="metric-streak-days">٠</span>
+                                    <span class="qm-lbl">أيام التزام</span>
+                                </div>
+                                <div class="q-metric">
+                                    <span class="qm-val" id="metric-memorized-pages">٠</span>
+                                    <span class="qm-lbl">صفحة متقنة</span>
+                                </div>
+                                <div class="q-metric">
+                                    <span class="qm-val" id="metric-eta-date">--</span>
+                                    <span class="qm-lbl">الختم المتوقع</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hero-bottom-actions">
+                        <button class="btn-outline-gold" onclick="app.openEditDayModal()">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" stroke-width="2"/></svg>
+                            <span>تعديل مخصص لأوراد هذا اليوم</span>
+                        </button>
+                        <button class="btn-outline-olive" onclick="app.openRebalanceModal()">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M23 4v6h-6M1 20v-6h6" stroke-width="2"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" stroke-width="2"/></svg>
+                            <span>تكييف الجدول / يوم راحة</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- قائمة الأوراد والمهام اليومية (الحفظ الجديد، الماضي القريب، الماضي البعيد، والمهام المخصصة) -->
+                <div class="section-header-bar">
+                    <div class="sh-right">
+                        <h3 class="section-heading">الأوراد المقررة</h3>
+                        <span id="methodology-tag" class="sub-pill">المنهج الثلاثي الراسخ</span>
+                    </div>
+                    <button class="btn-text-gold" onclick="app.openAddCustomTaskModal()">+ إضافة ورد حر لليوم</button>
+                </div>
+
+                <div id="daily-pillars-container" class="pillars-stack">
+                    <!-- يتم توليد بطاقات الأوراد هنا بدقة (مع أزرار الإنجاز، تقييم الجودة، التحرير الفوري، وتسجيل خطأ مباشر) -->
+                </div>
+
+                <!-- مفكرة اليوم التدبرية وملاحظات الجلسة -->
+                <div class="daily-reflection-card">
+                    <div class="dr-header">
+                        <h4>خاطرة التدبر أو ملاحظة جلسة اليوم</h4>
+                        <button class="btn-tiny-save" onclick="app.saveDailyNote()">حفظ الملاحظة</button>
+                    </div>
+                    <textarea id="daily-reflection-input" rows="2" placeholder="دوّن هنا فائدة تدبرية، أو ملاحظة عامة حول تركيزك وجودة تلاوتك اليوم..."></textarea>
+                </div>
+            </section>
+
+            <!-- =================================================================
+                 التبويب 2: هندسة الخطط والمسارات (Plans & Schedule Engine)
+                 ================================================================= -->
+            <section id="tab-plans" class="tab-pane">
+                
+                <div class="pane-intro-banner">
+                    <div class="pib-text">
+                        <h3>مُهندس الخطط والمسارات القرآنية</h3>
+                        <p>صمّم خطتك بحرية كاملة (بالصفحة أو بالربع أو بالسورة)، مع جدولة تلقائية لأيام التثبيت الأسبوعي وأيام الراحة والاحتياط.</p>
+                    </div>
+                    <button class="btn-primary-gold" onclick="app.openPlanBuilderModal()">
+                        <span>+ صياغة مسار جديد</span>
+                    </button>
+                </div>
+
+                <!-- قائمة جميع الخطط المحفوظة -->
+                <div class="section-header-bar">
+                    <h3 class="section-heading">مساراتك المحفوظة</h3>
+                    <span class="hint-text">اضغط على أي مسار لتفعيله أو تحرير قواعده</span>
+                </div>
+                <div id="plans-cards-grid" class="plans-cards-grid">
+                    <!-- بطاقات الخطط -->
+                </div>
+
+                <!-- جدول الأيام التفاعلي الكامل للخطة النشطة (قابل للتحرير لكل يوم) -->
+                <div class="schedule-explorer-card">
+                    <div class="se-header">
+                        <div>
+                            <h3 class="section-heading">الجدول الزمني التفصيلي للمسار النشط</h3>
+                            <p class="tiny-desc">كل يوم في هذا الجدول قابل للتعديل المباشر أو التبديل بين (يوم عمل / يوم مراجعة تجميعية / يوم راحة).</p>
+                        </div>
+                        <div class="se-filters">
+                            <select id="schedule-filter-select" class="royal-select-sm" onchange="app.renderScheduleTable()">
+                                <option value="all">كل الأيام</option>
+                                <option value="pending">المتبقية فقط</option>
+                                <option value="completed">المنجزة فقط</option>
+                                <option value="review">أيام المراجعة والراحة</option>
+                            </select>
+                            <button class="btn-outline-gold btn-sm" onclick="app.openAddDayToPlanModal()">+ إدراج يوم مخصص</button>
+                        </div>
+                    </div>
+
+                    <div id="plan-schedule-list" class="schedule-timeline-list">
+                        <!-- قائمة أيام الجدول مع تحرير حر -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- =================================================================
+                 التبويب 3: خريطة المصحف الحرارية (604-Page Mastery Map)
+                 ================================================================= -->
+            <section id="tab-mushaf" class="tab-pane">
+                
+                <div class="mushaf-overview-header">
+                    <div class="moh-top">
+                        <div>
+                            <h3>خريطة إتقان مصحف المدينة (٦٠٤ صفحات)</h3>
+                            <p class="tiny-desc">اضغط على أي صفحة أو جزء لتعديل حالة إتقانه يدوياً، أو استعرض الأرباع والسور المرتبطة به.</p>
+                        </div>
+                        <div class="mushaf-view-switcher">
+                            <button class="mview-btn active" id="mview-pages-btn" onclick="app.setMushafViewMode('pages')">بالصفحات (٦٠٤)</button>
+                            <button class="mview-btn" id="mview-juz-btn" onclick="app.setMushafViewMode('juz')">بالأجزاء (٣٠)</button>
+                        </div>
+                    </div>
+
+                    <!-- مفتاح الألوان الحراري (Heatmap Legend) + فلتر سريع -->
+                    <div class="heatmap-legend-bar">
+                        <div class="legend-item" onclick="app.filterMushafGrid('all')">
+                            <span class="l-dot dot-all"></span>
+                            <span>الكل (<b id="count-all-pages">٦٠٤</b>)</span>
+                        </div>
+                        <div class="legend-item" onclick="app.filterMushafGrid('mastered')">
+                            <span class="l-dot dot-mastered"></span>
+                            <span>متقن راسخ (<b id="count-mastered-pages">٠</b>)</span>
+                        </div>
+                        <div class="legend-item" onclick="app.filterMushafGrid('good')">
+                            <span class="l-dot dot-good"></span>
+                            <span>محفوظ جيد (<b id="count-good-pages">٠</b>)</span>
+                        </div>
+                        <div class="legend-item" onclick="app.filterMushafGrid('weak')">
+                            <span class="l-dot dot-weak"></span>
+                            <span>يحتاج تثبيت (<b id="count-weak-pages">٠</b>)</span>
+                        </div>
+                        <div class="legend-item" onclick="app.filterMushafGrid('unmemorized')">
+                            <span class="l-dot dot-unmemorized"></span>
+                            <span>غير محفوظ (<b id="count-unmemorized-pages">٦٠٤</b>)</span>
+                        </div>
+                    </div>
+
+                    <!-- أداة التحديد الجماعي السريع (Bulk Range Setter) -->
+                    <div class="bulk-page-setter">
+                        <span>تعيين سريع من ص</span>
+                        <input type="number" id="bulk-from-page" min="1" max="604" value="1" class="mini-num-input">
+                        <span>إلى ص</span>
+                        <input type="number" id="bulk-to-page" min="1" max="604" value="20" class="mini-num-input">
+                        <select id="bulk-status-select" class="royal-select-sm">
+                            <option value="mastered">متقن راسخ</option>
+                            <option value="good">محفوظ جيد</option>
+                            <option value="weak">يحتاج تثبيت / تفلت</option>
+                            <option value="unmemorized">غير محفوظ</option>
+                        </select>
+                        <button class="btn-outline-gold btn-sm" onclick="app.applyBulkPageStatus()">تطبيق</button>
+                    </div>
+                </div>
+
+                <!-- شبكة المصحف التفاعلية -->
+                <div id="mushaf-heatmap-container" class="mushaf-grid-container">
+                    <!-- خلايا الصفحات أو الأجزاء تتولد هنا -->
+                </div>
+            </section>
+
+            <!-- =================================================================
+                 التبويب 4: سجل المقرأة والإجازة (Sheikh Logbook, Mutashabihat & Sanad)
+                 ================================================================= -->
+            <section id="tab-logbook" class="tab-pane">
+                
+                <!-- شريط التنقل الداخلي لقسم المقرأة -->
+                <div class="sub-nav-pills">
+                    <button class="sub-pill-btn active" id="subtab-btn-mistakes" onclick="app.switchLogbookSubtab('mistakes')">سجل تصويب الأخطاء</button>
+                    <button class="sub-pill-btn" id="subtab-btn-mutashabihat" onclick="app.switchLogbookSubtab('mutashabihat')">دفتر المتشابهات والضوابط</button>
+                    <button class="sub-pill-btn" id="subtab-btn-ijazah" onclick="app.switchLogbookSubtab('ijazah')">ملف الإجازة والسند (اختياري)</button>
+                </div>
+
+                <!-- 4.A: قسم سجل تصويب الأخطاء والتنبيهات -->
+                <div id="logbook-sub-mistakes" class="logbook-subpane active">
+                    <div class="log-controls-card">
+                        <div class="lc-top">
+                            <input type="text" id="mistake-search-input" class="royal-input" placeholder="ابحث بالكلمة، السورة، الصفحة، أو نصيحة الشيخ..." oninput="app.renderMistakesList()">
+                            <button class="btn-primary-gold" onclick="app.openMistakeModal()">+ تدوين خطأ / تنبيه</button>
+                        </div>
+                        <div class="lc-filters">
+                            <select id="mistake-type-filter" class="royal-select-sm" onchange="app.renderMistakesList()">
+                                <option value="all">كل تصنيفات الأخطاء</option>
+                                <option value="forget">نسيان وتفلت</option>
+                                <option value="tashkeel">تشكيل وبنية كلمة</option>
+                                <option value="tajweed">حكم تجويدي ومخارج</option>
+                                <option value="mutashabih">لبس في المتشابهات</option>
+                                <option value="waqf">وقف وابتداء</option>
+                            </select>
+                            <select id="mistake-status-filter" class="royal-select-sm" onchange="app.renderMistakesList()">
+                                <option value="all">كل الحالات</option>
+                                <option value="open">قيد المعالجة والتكرار</option>
+                                <option value="resolved">تم الضبط والإتقان</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="mistakes-list-container" class="logs-cards-stack">
+                        <!-- بطاقات الأخطاء المسجلة مع نصيحة الشيخ وعداد التكرار التصحيحي -->
+                    </div>
+                </div>
+
+                <!-- 4.B: قسم دفتر المتشابهات اللفظية والضوابط -->
+                <div id="logbook-sub-mutashabihat" class="logbook-subpane hidden">
+                    <div class="pane-intro-banner">
+                        <div class="pib-text">
+                            <h3>خزانة المتشابهات والضوابط القرآنية</h3>
+                            <p>اربط الآيات المتشابهة بضوابطها الذهنية واللمسات البيانية، مع إمكانية الإضافة والتحرير الكامل.</p>
+                        </div>
+                        <button class="btn-primary-gold" onclick="app.openMutashabihModal()">+ إضافة قاعدة متشابهات</button>
+                    </div>
+                    <div id="mutashabihat-list-container" class="logs-cards-stack">
+                        <!-- بطاقات المتشابهات -->
+                    </div>
+                </div>
+
+                <!-- 4.C: قسم ملف الإجازة والسند (اختياري وقابل للتخصيص الكامل) -->
+                <div id="logbook-sub-ijazah" class="logbook-subpane hidden">
+                    <div class="ijazah-folio-card">
+                        <div class="folio-header">
+                            <div>
+                                <h3>وثيقة مسار العرض والإجازة</h3>
+                                <p class="tiny-desc">بيانات اختيارية لتوثيق ختمة العرض على الشيخ والرواية المعتمدة وشجرة السند.</p>
+                            </div>
+                            <button class="btn-outline-gold btn-sm" onclick="app.saveIjazahProfile()">حفظ التعديلات</button>
+                        </div>
+
+                        <div class="ijazah-form-grid">
+                            <div class="form-group">
+                                <label>اسم الشيخ المقرئ / المشرف</label>
+                                <input type="text" id="ijazah-sheikh-name" class="royal-input" placeholder="مثال: فضيلة الشيخ المقرئ...">
+                            </div>
+                            <div class="form-group">
+                                <label>الرواية والطريق</label>
+                                <input type="text" id="ijazah-riwayah" class="royal-input" placeholder="مثال: حفص عن عاصم من طريق الشاطبية">
+                            </div>
+                            <div class="form-group">
+                                <label>الموضع الواصل إليه في العرض</label>
+                                <input type="number" id="ijazah-current-page" min="0" max="604" class="royal-input" placeholder="رقم الصفحة (١ - ٦٠٤)">
+                            </div>
+                            <div class="form-group">
+                                <label>تاريخ بدء ختمة العرض</label>
+                                <input type="date" id="ijazah-start-date" class="royal-input">
+                            </div>
+                            <div class="form-group full-width">
+                                <label>سلسلة السند أو شروط الشيخ الخاصة</label>
+                                <textarea id="ijazah-sanad-notes" rows="4" class="royal-input" placeholder="دوّن هنا سلسلة السند المتصل أو منهج الشيخ وشروطه في الإجازة..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- =================================================================
+                 التبويب 5: الميزان والتقييم الدوري (Periodic Audits & Analytics)
+                 ================================================================= -->
+            <section id="tab-analytics" class="tab-pane">
+                
+                <!-- شريط اختيار فترة التقييم -->
+                <div class="audit-period-selector">
+                    <button class="period-btn active" data-period="weekly" onclick="app.setAuditPeriod('weekly')">التقييم الأسبوعي</button>
+                    <button class="period-btn" data-period="monthly" onclick="app.setAuditPeriod('monthly')">التقييم الشهري</button>
+                    <button class="period-btn" data-period="comprehensive" onclick="app.setAuditPeriod('comprehensive')">الميزان الشامل</button>
+                </div>
+
+                <!-- بطاقات المؤشرات التحليلية الدقيقة -->
+                <div id="analytics-kpi-grid" class="kpi-cards-grid">
+                    <!-- تتولد مؤشرات الأداء هنا -->
+                </div>
+
+                <!-- محرك التدقيق والاختبار الدوري (Self/Sheikh Audit Engine) -->
+                <div class="periodic-audit-card">
+                    <div class="pa-header">
+                        <div>
+                            <h3 id="audit-form-title">جلسة التقييم والتدقيق الأسبوعي</h3>
+                            <p class="tiny-desc">لا ينتقل الحافظ المتقن لمرحلة جديدة دون محاسبة وتدقيق لما مضى. سجل تقييمك الدوري هنا.</p>
+                        </div>
+                        <button class="btn-primary-gold btn-sm" onclick="app.openNewAuditModal()">+ إجراء تقييم جديد</button>
+                    </div>
+
+                    <div id="audits-history-list" class="audits-history-stack">
+                        <!-- سجل التقييمات الأسبوعية والشهرية السابقة مع إمكانية تحريرها -->
+                    </div>
+                </div>
+
+                <!-- تحليل نقاط الضعف والأخطاء المتكررة -->
+                <div class="weakness-radar-card">
+                    <h3 class="section-heading">رادار المواضع الأكثر حاجة للتثبيت</h3>
+                    <p class="tiny-desc">يتم استخراج هذه المواضع تلقائياً بناءً على تقييماتك اليومية وسجل أخطاء المقرأة.</p>
+                    <div id="weak-spots-list" class="weak-spots-grid">
+                        <!-- قائمة الصفحات أو السور التي تكرر فيها الخطأ -->
+                    </div>
+                </div>
+
+            </section>
+
+        </main>
+
+        <!-- =====================================================================
+             شريط التبويبات السفلي الذكي (5-Tab Royal Bottom Navigation)
+             ===================================================================== -->
+        <nav class="bottom-nav-bar">
+            <button class="bnav-item active" data-tab="tab-dashboard" onclick="app.switchTab('tab-dashboard')">
+                <svg class="bnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M12 3L4 9v12h16V9l-8-6z" stroke-width="1.8" stroke-linejoin="round"/>
+                    <path d="M9 21V12h6v9" stroke-width="1.8" stroke-linejoin="round"/>
+                </svg>
+                <span>المحراب</span>
+            </button>
+
+            <button class="bnav-item" data-tab="tab-plans" onclick="app.switchTab('tab-plans')">
+                <svg class="bnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <rect x="3" y="4" width="18" height="18" rx="2" stroke-width="1.8"/>
+                    <line x1="16" y1="2" x2="16" y2="6" stroke-width="1.8" stroke-linecap="round"/>
+                    <line x1="8" y1="2" x2="8" y2="6" stroke-width="1.8" stroke-linecap="round"/>
+                    <line x1="3" y1="10" x2="21" y2="10" stroke-width="1.8"/>
+                </svg>
+                <span>الخطط</span>
+            </button>
+
+            <button class="bnav-item" data-tab="tab-mushaf" onclick="app.switchTab('tab-mushaf')">
+                <svg class="bnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" stroke-width="1.8" stroke-linejoin="round"/>
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" stroke-width="1.8" stroke-linejoin="round"/>
+                </svg>
+                <span>المصحف</span>
+            </button>
+
+            <button class="bnav-item" data-tab="tab-logbook" onclick="app.switchTab('tab-logbook')">
+                <svg class="bnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M12 20h9" stroke-width="1.8" stroke-linecap="round"/>
+                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" stroke-width="1.8" stroke-linejoin="round"/>
+                </svg>
+                <span>المقرأة</span>
+            </button>
+
+            <button class="bnav-item" data-tab="tab-analytics" onclick="app.switchTab('tab-analytics')">
+                <svg class="bnav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M18 20V10M12 20V4M6 20v-6" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <span>الميزان</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <!-- =========================================================================
+         3. نظام النوافذ المنبثقة الشامل للتحرير الحر (Dynamic Modal System)
+         ========================================================================= -->
+    <div id="modal-backdrop" class="modal-backdrop hidden" onclick="app.handleBackdropClick(event)">
+        <div class="modal-dialog" id="modal-dialog-box">
+            <div class="modal-header">
+                <h3 id="modal-title">عنوان النافذة</h3>
+                <button class="modal-close-btn" onclick="app.closeModal()">✕</button>
+            </div>
+            <div class="modal-body" id="modal-body-content">
+                <!-- يُحقن محتوى النماذج التفاعلية هنا -->
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================================
+         4. حاوية الإشعارات الفورية الأنيقة (Royal Toast Notifications)
+         ========================================================================= -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- استدعاء المحركات البرمجية بالترتيب الهندسي الصحيح -->
+    <script src="quran-data.js"></script>
+    <script src="storage.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
